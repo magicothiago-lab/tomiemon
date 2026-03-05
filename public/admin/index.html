@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Wealth Club</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>Admin Panel</h1>
+                <p>Manage users and transactions</p>
+            </div>
+            <div class="header-right">
+                <a href="/dashboard/" class="btn btn-secondary">Dashboard</a>
+                <button id="admin-logout-btn" class="btn btn-secondary">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Dashboard Overview -->
+        <section class="summary-section">
+            <div class="summary-card" data-testid="admin-total-users">
+                <div class="card-icon">👥</div>
+                <h3>Total Users</h3>
+                <p class="card-value" id="total-users">0</p>
+            </div>
+            <div class="summary-card" data-testid="admin-total-deposits">
+                <div class="card-icon">💰</div>
+                <h3>Total Deposits</h3>
+                <p class="card-value" id="total-deposits">$0.00</p>
+            </div>
+            <div class="summary-card" data-testid="admin-total-withdrawals">
+                <div class="card-icon">💸</div>
+                <h3>Total Withdrawals</h3>
+                <p class="card-value" id="total-withdrawals">$0.00</p>
+            </div>
+            <div class="summary-card" data-testid="admin-platform-balance">
+                <div class="card-icon">🏦</div>
+                <h3>Platform Balance</h3>
+                <p class="card-value" id="platform-balance">$0.00</p>
+            </div>
+        </section>
+
+        <!-- Users Table -->
+        <section class="transaction-section">
+            <h2>Users Management</h2>
+            <div class="table-container">
+                <table class="transaction-table" data-testid="admin-users-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Balance</th>
+                            <th>Total Invested</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                        <tr>
+                            <td colspan="6" class="no-data">Loading users...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Pending Withdrawals -->
+        <section class="transaction-section">
+            <h2>Pending Withdrawal Requests</h2>
+            <div class="table-container">
+                <table class="transaction-table" data-testid="admin-withdrawals-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>User</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="withdrawals-tbody">
+                        <tr>
+                            <td colspan="5" class="no-data">No pending withdrawals</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Edit Balance Modal -->
+    <div id="edit-balance-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" data-modal="edit-balance-modal">&times;</span>
+            <h2>Edit User Balance</h2>
+            <form id="edit-balance-form">
+                <input type="hidden" id="edit-user-id">
+                <div class="form-group">
+                    <label for="edit-profit">Profit</label>
+                    <input type="number" id="edit-profit" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-balance">Available Balance</label>
+                    <input type="number" id="edit-balance" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-progress">Total In Progress</label>
+                    <input type="number" id="edit-progress" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-invested">Total Invested</label>
+                    <input type="number" id="edit-invested" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary" data-testid="save-balance-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Firebase SDK v9 (Modular) -->
+    <script type="module" src="/js/firebase.js"></script>
+    <script type="module" src="/js/admin.js"></script>
+</body>
+
+</html>

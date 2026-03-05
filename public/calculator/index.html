@@ -1,0 +1,610 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a2540">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Wealth Club">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description"
+        content="Calculate your potential investment returns with Wealth Club's investment calculator.">
+
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="https://i.ibb.co/Ldx4SFsg/WCLogo.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://i.ibb.co/Ldx4SFsg/WCLogo.png">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/Ldx4SFsg/WCLogo.png">
+
+    <title>Investment Calculator - Wealth Club</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Calculator Specific Styles */
+        .calculator-section {
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .calculator-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .calculator-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .calculator-header h2 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .calculator-header p {
+            color: var(--text-secondary);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .range-container {
+            margin-top: 0.5rem;
+        }
+
+        .range-container input[type="range"] {
+            width: 100%;
+            height: 14px;
+            border-radius: 7px;
+            background: linear-gradient(90deg, #00d4aa 0%, #635bff 100%);
+            outline: none;
+            -webkit-appearance: none;
+            border: 2px solid rgba(99, 91, 255, 0.3);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .range-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4aa, #00b894);
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.6), 0 0 0 4px rgba(255, 255, 255, 0.9);
+            border: 3px solid white;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .range-container input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 212, 170, 0.8), 0 0 0 5px rgba(255, 255, 255, 1);
+        }
+
+        .range-container input[type="range"]::-moz-range-thumb {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4aa, #00b894);
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.6), 0 0 0 4px rgba(255, 255, 255, 0.9);
+            border: 3px solid white;
+        }
+
+        .range-container input[type="range"]::-moz-range-track {
+            height: 14px;
+            border-radius: 7px;
+            background: linear-gradient(90deg, #00d4aa 0%, #635bff 100%);
+        }
+
+        .range-value {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 1.2rem 2.5rem;
+            background: linear-gradient(135deg, #00d4aa 0%, #00b894 50%, #635bff 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 1.5rem;
+            box-shadow: 0 6px 20px rgba(0, 212, 170, 0.4), 0 2px 8px rgba(99, 91, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 35px rgba(0, 212, 170, 0.5), 0 4px 15px rgba(99, 91, 255, 0.4);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .calculate-btn i {
+            margin-right: 0.5rem;
+        }
+
+        .results-section {
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--border-color);
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.1), rgba(99, 91, 255, 0.1));
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .result-card .label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .result-card.highlight {
+            background: linear-gradient(135deg, var(--accent-color), #635bff);
+        }
+
+        .result-card.highlight .label,
+        .result-card.highlight .value {
+            color: white;
+        }
+
+        .chart-container {
+            background: var(--bg-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 200px;
+            padding: 1rem 0;
+        }
+
+        .chart-bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            max-width: 60px;
+        }
+
+        .chart-bar {
+            width: 45px;
+            background: linear-gradient(to top, #00d4aa 0%, #00b894 40%, #635bff 100%);
+            border-radius: 8px 8px 0 0;
+            transition: height 0.5s ease;
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-bottom: none;
+        }
+
+        .chart-bar:hover {
+            box-shadow: 0 6px 25px rgba(0, 212, 170, 0.6);
+            transform: scaleY(1.02);
+        }
+
+        .chart-label {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .disclaimer {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 193, 7, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .disclaimer p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .disclaimer i {
+            color: #ffc107;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="index.html" class="logo">
+                <img src="https://i.imgur.com/eY5ii7J.png" alt="WealthClub Logo">
+            </a>
+        </div>
+
+        <div class="nav-controls">
+            <a href="/" class="nav-link" data-i18n="home">Home</a>
+            <a href="/how-it-works/" class="nav-link" data-i18n="howItWorks">How It Works</a>
+            <a href="/calculator/" class="nav-link" data-i18n="calculator">Calculator</a>
+            <a href="/portfolio/" class="nav-link" data-i18n="portfolio">Portfolio</a>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
+            <div class="language-selector">
+                <button class="lang-btn" onclick="translatePage('en')" title="English">🇬🇧</button>
+                <button class="lang-btn" onclick="translatePage('pt')" title="Português">🇧🇷</button>
+                <button class="lang-btn" onclick="translatePage('ja')" title="日本語">🇯🇵</button>
+            </div>
+            <a href="/login/" class="login-btn" data-i18n="login">Login</a>
+        </div>
+    </nav>
+
+    <section class="hero" style="padding: 6rem 2rem 3rem;">
+        <div class="hero-graphics">
+            <svg class="animated-blob blob-1" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#00d4aa"
+                    d="M44.7,-76.4C58.8,-69.2,71.8,-59.1,79.6,-45.8C87.4,-32.6,90,-16.3,88.5,-0.9C87,14.6,81.4,29.2,73.1,42.8C64.8,56.4,53.8,69,40.1,76.8C26.4,84.6,10,87.6,-5.7,86.8C-21.4,86,-42.8,81.4,-56.8,71.2C-70.8,61,-77.4,45.2,-81.5,28.8C-85.6,12.4,-87.2,-4.6,-83.7,-20.5C-80.2,-36.4,-71.6,-51.2,-59.4,-59.2C-47.2,-67.2,-31.4,-68.4,-16.3,-73.8C-1.2,-79.2,13.2,-88.8,27.8,-89.6C42.4,-90.4,57.2,-82.4,44.7,-76.4Z"
+                    transform="translate(100 100)" />
+            </svg>
+            <svg class="animated-blob blob-2" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#635bff"
+                    d="M39.5,-65.4C51.4,-58.1,61.5,-47.3,68.4,-34.8C75.3,-22.3,79,-8.1,77.8,5.7C76.6,19.5,70.5,33,61.4,44.3C52.3,55.6,40.2,64.7,26.8,69.8C13.4,74.9,-1.3,76,-15.1,72.8C-28.9,69.6,-41.8,62.1,-53.3,52.1C-64.8,42.1,-74.9,29.6,-79.1,15.3C-83.3,1,-81.6,-15.1,-74.8,-28.5C-68,-41.9,-56.1,-52.6,-43.2,-59.5C-30.3,-66.4,-16.2,-69.5,-1.6,-67.1C13,-64.7,26,-56.8,39.5,-65.4Z"
+                    transform="translate(100 100)" />
+            </svg>
+        </div>
+        <div class="hero-content">
+            <h1 class="fade-in" data-i18n="calcHeroTitle">Investment Calculator</h1>
+            <p class="fade-in delay-1" data-i18n="calcHeroSubtitle">Visualize your potential returns and plan your
+                financial future with our interactive calculator.</p>
+        </div>
+    </section>
+
+    <section class="calculator-section">
+        <div class="calculator-card fade-in">
+            <div class="calculator-header">
+                <h2 data-i18n="calcTitle">Calculate Your Returns</h2>
+                <p data-i18n="calcSubtitle">Enter your investment details to see projected growth</p>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="initialInvestment" data-i18n="initialInvestment">Initial Investment (€)</label>
+                    <input type="number" id="initialInvestment" value="1000" min="10" step="100">
+                </div>
+                <div class="input-group">
+                    <label for="monthlyContribution" data-i18n="monthlyContribution">Monthly Contribution (€)</label>
+                    <input type="number" id="monthlyContribution" value="100" min="0" step="50">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="investmentPeriod" data-i18n="investmentPeriod">Investment Period (Years)</label>
+                <div class="range-container">
+                    <input type="range" id="investmentPeriod" min="1" max="30" value="10">
+                    <div class="range-value">
+                        <span>1 year</span>
+                        <span id="periodValue">10 years</span>
+                        <span>30 years</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="expectedReturn" data-i18n="expectedReturn">Expected Annual Return (%)</label>
+                <div class="range-container">
+                    <input type="range" id="expectedReturn" min="1" max="15" value="8" step="0.5">
+                    <div class="range-value">
+                        <span>1%</span>
+                        <span id="returnValue">8%</span>
+                        <span>15%</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="calculate-btn" onclick="calculateInvestment()" data-i18n="calculateBtn">
+                <i class="fas fa-calculator"></i> Calculate Returns
+            </button>
+
+            <div class="results-section" id="resultsSection">
+                <div class="results-grid">
+                    <div class="result-card">
+                        <div class="label" data-i18n="totalContributions">Total Contributions</div>
+                        <div class="value" id="totalContributions">€0</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="label" data-i18n="totalInterest">Total Interest Earned</div>
+                        <div class="value" id="totalInterest">€0</div>
+                    </div>
+                    <div class="result-card highlight">
+                        <div class="label" data-i18n="finalValue">Final Value</div>
+                        <div class="value" id="finalValue">€0</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title" data-i18n="growthChart">Investment Growth Over Time</div>
+                    <div class="chart-bars" id="chartBars"></div>
+                </div>
+
+                <div class="disclaimer">
+                    <p><i class="fas fa-info-circle"></i> <span data-i18n="disclaimer">This calculator provides
+                            estimates for illustrative purposes only. Actual returns may vary. Past performance does not
+                            guarantee future results.</span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <h2 class="fade-in" data-i18n="ctaTitle">Ready to Start Investing?</h2>
+        <p class="fade-in delay-1" data-i18n="calcCtaSubtitle">Turn these projections into reality. Join Wealth Club
+            today and start building your wealth.</p>
+        <a href="/login/" class="cta-btn fade-in delay-2" data-i18n="ctaButton">Get Started Now</a>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Wealth Club</h3>
+                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">Building financial futures through
+                        strategic investment and wealth preservation.</p>
+                    <div class="social-links">
+                        <a href="https://t.me/+btRgoRmPJ5NmZjVh" aria-label="Telegram"><i
+                                class="fab fa-telegram"></i></a>
+                        <a href="https://wa.link/fr5kt4" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Wealth Club. All rights reserved. | Private Investment Fund</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/i18n.js"></script>
+    <script src="/script.js"></script>
+    <script>
+        // Update range display values
+        document.getElementById('investmentPeriod').addEventListener('input', function () {
+            document.getElementById('periodValue').textContent = this.value + ' years';
+        });
+
+        document.getElementById('expectedReturn').addEventListener('input', function () {
+            document.getElementById('returnValue').textContent = this.value + '%';
+        });
+
+        function calculateInvestment() {
+            const initial = parseFloat(document.getElementById('initialInvestment').value) || 0;
+            const monthly = parseFloat(document.getElementById('monthlyContribution').value) || 0;
+            const years = parseInt(document.getElementById('investmentPeriod').value) || 1;
+            const annualRate = parseFloat(document.getElementById('expectedReturn').value) / 100 || 0.08;
+
+            const monthlyRate = annualRate / 12;
+            const months = years * 12;
+
+            // Calculate future value with compound interest
+            let futureValue = initial * Math.pow(1 + monthlyRate, months);
+
+            // Add monthly contributions with compound interest
+            if (monthly > 0) {
+                futureValue += monthly * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+            }
+
+            const totalContributions = initial + (monthly * months);
+            const totalInterest = futureValue - totalContributions;
+
+            // Update results
+            document.getElementById('totalContributions').textContent = '€' + formatNumber(totalContributions);
+            document.getElementById('totalInterest').textContent = '€' + formatNumber(totalInterest);
+            document.getElementById('finalValue').textContent = '€' + formatNumber(futureValue);
+
+            // Show results section
+            document.getElementById('resultsSection').classList.add('show');
+
+            // Generate chart
+            generateChart(initial, monthly, years, annualRate);
+        }
+
+        function formatNumber(num) {
+            return Math.round(num).toLocaleString('en-US');
+        }
+
+        function generateChart(initial, monthly, years, annualRate) {
+            const chartContainer = document.getElementById('chartBars');
+            chartContainer.innerHTML = '';
+
+            const monthlyRate = annualRate / 12;
+            const dataPoints = Math.min(years, 10);
+            const interval = Math.ceil(years / dataPoints);
+
+            let values = [];
+            for (let y = interval; y <= years; y += interval) {
+                const months = y * 12;
+                let value = initial * Math.pow(1 + monthlyRate, months);
+                if (monthly > 0) {
+                    value += monthly * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+                }
+                values.push({ year: y, value: value });
+            }
+
+            const maxValue = Math.max(...values.map(v => v.value));
+
+            values.forEach(point => {
+                const height = (point.value / maxValue) * 180;
+                const barContainer = document.createElement('div');
+                barContainer.className = 'chart-bar-container';
+                barContainer.innerHTML = `
+                    <div class="chart-bar" style="height: ${height}px;" title="€${formatNumber(point.value)}"></div>
+                    <div class="chart-label">Year ${point.year}</div>
+                `;
+                chartContainer.appendChild(barContainer);
+            });
+        }
+
+        // Add calculator translations to i18n
+        if (typeof translations !== 'undefined') {
+            Object.assign(translations.en, {
+                calcHeroTitle: "Investment Calculator",
+                calcHeroSubtitle: "Visualize your potential returns and plan your financial future with our interactive calculator.",
+                calcTitle: "Calculate Your Returns",
+                calcSubtitle: "Enter your investment details to see projected growth",
+                initialInvestment: "Initial Investment (€)",
+                monthlyContribution: "Monthly Contribution (€)",
+                investmentPeriod: "Investment Period (Years)",
+                expectedReturn: "Expected Annual Return (%)",
+                calculateBtn: "Calculate Returns",
+                totalContributions: "Total Contributions",
+                totalInterest: "Total Interest Earned",
+                finalValue: "Final Value",
+                growthChart: "Investment Growth Over Time",
+                disclaimer: "This calculator provides estimates for illustrative purposes only. Actual returns may vary. Past performance does not guarantee future results.",
+                calcCtaSubtitle: "Turn these projections into reality. Join Wealth Club today and start building your wealth.",
+                calculator: "Calculator"
+            });
+
+            Object.assign(translations.pt, {
+                calcHeroTitle: "Calculadora de Investimentos",
+                calcHeroSubtitle: "Visualize seus retornos potenciais e planeje seu futuro financeiro com nossa calculadora interativa.",
+                calcTitle: "Calcule Seus Retornos",
+                calcSubtitle: "Insira os detalhes do seu investimento para ver o crescimento projetado",
+                initialInvestment: "Investimento Inicial (€)",
+                monthlyContribution: "Contribuição Mensal (€)",
+                investmentPeriod: "Período de Investimento (Anos)",
+                expectedReturn: "Retorno Anual Esperado (%)",
+                calculateBtn: "Calcular Retornos",
+                totalContributions: "Total de Contribuições",
+                totalInterest: "Total de Juros Ganhos",
+                finalValue: "Valor Final",
+                growthChart: "Crescimento do Investimento ao Longo do Tempo",
+                disclaimer: "Esta calculadora fornece estimativas apenas para fins ilustrativos. Os retornos reais podem variar. O desempenho passado não garante resultados futuros.",
+                calcCtaSubtitle: "Transforme essas projeções em realidade. Junte-se ao Wealth Club hoje e comece a construir sua riqueza.",
+                calculator: "Calculadora"
+            });
+
+            Object.assign(translations.ja, {
+                calcHeroTitle: "投資計算機",
+                calcHeroSubtitle: "インタラクティブな計算機で潜在的なリターンを視覚化し、財務の未来を計画しましょう。",
+                calcTitle: "リターンを計算",
+                calcSubtitle: "投資の詳細を入力して予測成長を確認",
+                initialInvestment: "初期投資額 (€)",
+                monthlyContribution: "毎月の積立額 (€)",
+                investmentPeriod: "投資期間（年）",
+                expectedReturn: "予想年間リターン (%)",
+                calculateBtn: "リターンを計算",
+                totalContributions: "総投資額",
+                totalInterest: "獲得利息合計",
+                finalValue: "最終価値",
+                growthChart: "時間経過による投資成長",
+                disclaimer: "この計算機は説明目的のみの推定値を提供します。実際のリターンは異なる場合があります。過去の実績は将来の結果を保証するものではありません。",
+                calcCtaSubtitle: "これらの予測を現実に変えましょう。今すぐWealth Clubに参加して、資産形成を始めましょう。",
+                calculator: "計算機"
+            });
+        }
+    </script>
+</body>
+
+</html>

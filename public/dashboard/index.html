@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>Investment Dashboard</h1>
+                <p id="welcome-message">Welcome, <span id="user-name">User</span></p>
+            </div>
+            <div class="header-right">
+                <button id="logout-btn" class="btn btn-secondary">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Action Buttons Section -->
+        <section class="action-section">
+            <button class="action-btn" id="deposit-btn" data-testid="deposit-btn">
+                <div class="action-icon">💰</div>
+                <h3>Deposit</h3>
+                <p>Add funds to your account</p>
+            </button>
+            <button class="action-btn" id="withdraw-btn" data-testid="withdraw-btn">
+                <div class="action-icon">💸</div>
+                <h3>Withdraw Request</h3>
+                <p>Request a withdrawal</p>
+            </button>
+            <button class="action-btn" id="bank-details-btn" data-testid="bank-details-btn">
+                <div class="action-icon">🏦</div>
+                <h3>Bank Details</h3>
+                <p>Update banking information</p>
+            </button>
+        </section>
+
+        <!-- Financial Summary Cards -->
+        <section class="summary-section">
+            <div class="summary-card" data-testid="profit-card">
+                <div class="card-icon">📈</div>
+                <h3>Profit</h3>
+                <p class="card-value" id="profit-value">$0.00</p>
+            </div>
+            <div class="summary-card" data-testid="balance-card">
+                <div class="card-icon">💵</div>
+                <h3>Available Balance</h3>
+                <p class="card-value" id="balance-value">$0.00</p>
+            </div>
+            <div class="summary-card" data-testid="progress-card">
+                <div class="card-icon">⏳</div>
+                <h3>Total In Progress</h3>
+                <p class="card-value" id="progress-value">$0.00</p>
+            </div>
+            <div class="summary-card" data-testid="invested-card">
+                <div class="card-icon">💎</div>
+                <h3>Total Invested</h3>
+                <p class="card-value" id="invested-value">$0.00</p>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <div class="chart-card">
+                <h3>Profit Growth Over Time</h3>
+                <canvas id="profit-chart" data-testid="profit-chart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Portfolio Distribution</h3>
+                <canvas id="portfolio-chart" data-testid="portfolio-chart"></canvas>
+            </div>
+            <div class="chart-card full-width">
+                <h3>Monthly Deposits</h3>
+                <canvas id="deposits-chart" data-testid="deposits-chart"></canvas>
+            </div>
+        </section>
+
+        <!-- Transaction History Table -->
+        <section class="transaction-section">
+            <h2>Transaction History</h2>
+            <div class="table-container">
+                <table class="transaction-table" data-testid="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Reference ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactions-tbody">
+                        <tr>
+                            <td colspan="5" class="no-data">No transactions yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div id="deposit-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" data-modal="deposit-modal">&times;</span>
+            <h2>Make a Deposit</h2>
+            <form id="deposit-form">
+                <div class="form-group">
+                    <label for="deposit-amount">Amount ($)</label>
+                    <input type="number" id="deposit-amount" placeholder="Enter amount" min="1" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary" data-testid="deposit-submit-btn">Submit Deposit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div id="withdraw-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" data-modal="withdraw-modal">&times;</span>
+            <h2>Request Withdrawal</h2>
+            <form id="withdraw-form">
+                <div class="form-group">
+                    <label for="withdraw-amount">Amount ($)</label>
+                    <input type="number" id="withdraw-amount" placeholder="Enter amount" min="1" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary" data-testid="withdraw-submit-btn">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bank Details Modal -->
+    <div id="bank-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" data-modal="bank-modal">&times;</span>
+            <h2>Update Bank Details</h2>
+            <form id="bank-form">
+                <div class="form-group">
+                    <label for="bank-name">Bank Name</label>
+                    <input type="text" id="bank-name" placeholder="Enter bank name" required>
+                </div>
+                <div class="form-group">
+                    <label for="account-number">Account Number / IBAN</label>
+                    <input type="text" id="account-number" placeholder="Enter account number" required>
+                </div>
+                <button type="submit" class="btn btn-primary" data-testid="bank-submit-btn">Save Details</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Firebase SDK v9 (Modular) -->
+    <script type="module" src="/js/firebase.js"></script>
+    <script type="module" src="/js/dashboard.js"></script>
+</body>
+</html>

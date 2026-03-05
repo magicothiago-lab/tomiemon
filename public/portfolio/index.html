@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a2540">
+    <title>Portfolio Performance - Wealth Club</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://i.ibb.co/Ldx4SFsg/WCLogo.png">
+    <style>
+        /* Portfolio Page Specific Styles */
+        .portfolio-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .portfolio-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .portfolio-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .portfolio-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Summary Cards - matching stats style */
+        .portfolio-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            padding: 0 5%;
+        }
+
+        .portfolio-stat-item {
+            padding: 1.75rem;
+            border-radius: 18px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .portfolio-stat-item:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        [data-theme="dark"] .portfolio-stat-item {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        [data-theme="dark"] .portfolio-stat-item:hover {
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .portfolio-stat-item i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+
+        .portfolio-stat-number {
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .portfolio-stat-number.positive {
+            color: #00d4aa;
+        }
+
+        .portfolio-stat-number.negative {
+            color: #ff5252;
+        }
+
+        .portfolio-stat-label {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+        }
+
+        [data-theme="dark"] .chart-container {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-controls button {
+            padding: 0.5rem 1rem;
+            border: 2px solid rgba(99, 91, 255, 0.3);
+            background: transparent;
+            color: var(--dark);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .chart-controls button:hover,
+        .chart-controls button.active {
+            background: linear-gradient(135deg, var(--secondary), #00b894);
+            border-color: var(--secondary);
+            color: white;
+        }
+
+        .chart-canvas-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        #performanceChart {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Legend */
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .legend-color.principal {
+            background: var(--accent);
+        }
+
+        .legend-color.returns {
+            background: linear-gradient(90deg, var(--secondary), #00b894);
+        }
+
+        .legend-color.total {
+            background: #ff9f43;
+        }
+
+        /* Loans Table */
+        .loans-section {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+        }
+
+        [data-theme="dark"] .loans-section {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .loans-section h3 {
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            font-size: 1.3rem;
+        }
+
+        .loans-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .loans-table th,
+        .loans-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(99, 91, 255, 0.15);
+        }
+
+        .loans-table th {
+            color: var(--gray);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .loans-table td {
+            color: var(--dark);
+        }
+
+        .loans-table tbody tr:hover {
+            background: rgba(99, 91, 255, 0.05);
+        }
+
+        [data-theme="dark"] .loans-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: rgba(0, 212, 170, 0.15);
+            color: #00d4aa;
+        }
+
+        .status-badge.completed {
+            background: rgba(99, 91, 255, 0.15);
+            color: #635bff;
+        }
+
+        .status-badge.pending {
+            background: rgba(255, 159, 67, 0.15);
+            color: #ff9f43;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .portfolio-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .chart-canvas-container {
+                height: 300px;
+            }
+
+            .portfolio-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .loans-table {
+                font-size: 0.85rem;
+            }
+
+            .loans-table th,
+            .loans-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation - Same as index.html -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="index.html" class="logo">
+                <img src="https://i.imgur.com/eY5ii7J.png" alt="WealthClub Logo">
+            </a>
+        </div>
+        <div class="nav-controls">
+            <a href="/" class="nav-link" data-i18n="home">Home</a>
+            <a href="/how-it-works/" class="nav-link" data-i18n="howItWorks">How It Works</a>
+            <a href="/calculator/" class="nav-link" data-i18n="calculator">Calculator</a>
+            <a href="/portfolio/" class="nav-link" data-i18n="portfolio">Portfolio</a>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
+            <div class="language-selector">
+                <button class="lang-btn" onclick="translatePage('en')" title="English">🇬🇧</button>
+                <button class="lang-btn" onclick="translatePage('pt')" title="Português">🇧🇷</button>
+                <button class="lang-btn" onclick="translatePage('ja')" title="日本語">🇯🇵</button>
+            </div>
+            <a href="/login/" class="login-btn" data-i18n="login">Login</a>
+        </div>
+    </nav>
+
+    <main class="portfolio-section">
+        <!-- Header -->
+        <div class="portfolio-header fade-in">
+            <h1 data-i18n="portfolioTitle"><i class="fas fa-chart-line"></i> Portfolio Performance</h1>
+            <p data-i18n="portfolioSubtitle">Track the performance of our loan portfolio and your investment returns</p>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="portfolio-stats">
+            <div class="portfolio-stat-item fade-in">
+                <i class="fas fa-wallet"></i>
+                <div class="portfolio-stat-number" id="totalInvested">€38,000</div>
+                <div class="portfolio-stat-label" data-i18n="totalInvested">Total Invested</div>
+            </div>
+            <div class="portfolio-stat-item fade-in delay-1">
+                <i class="fas fa-hand-holding-usd"></i>
+                <div class="portfolio-stat-number" id="activeLoans">12</div>
+                <div class="portfolio-stat-label" data-i18n="activeLoans">Active Loans</div>
+            </div>
+            <div class="portfolio-stat-item fade-in delay-2">
+                <i class="fas fa-coins"></i>
+                <div class="portfolio-stat-number" id="currentValue">€41,800</div>
+                <div class="portfolio-stat-label" data-i18n="currentValue">Current Value</div>
+            </div>
+            <div class="portfolio-stat-item fade-in delay-3">
+                <i class="fas fa-percentage"></i>
+                <div class="portfolio-stat-number positive" id="totalReturn">+10.0%</div>
+                <div class="portfolio-stat-label" data-i18n="totalReturn">Total Return</div>
+            </div>
+        </div>
+
+        <!-- Performance Chart -->
+        <div class="chart-container fade-in">
+            <div class="chart-header">
+                <div class="chart-title" data-i18n="performanceOverTime">Performance Over Time</div>
+                <div class="chart-controls">
+                    <button class="active" data-range="all">All</button>
+                    <button data-range="1y">1Y</button>
+                    <button data-range="6m">6M</button>
+                    <button data-range="3m">3M</button>
+                </div>
+            </div>
+            <div class="chart-canvas-container">
+                <canvas id="performanceChart"></canvas>
+            </div>
+            <div class="chart-legend">
+                <div class="legend-item">
+                    <div class="legend-color principal"></div>
+                    <span data-i18n="principalInvested">Principal Invested</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color returns"></div>
+                    <span data-i18n="portfolioValue">Portfolio Value</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color total"></div>
+                    <span data-i18n="interestEarned">Interest Earned</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Loans Table -->
+        <div class="loans-section fade-in">
+            <h3><i class="fas fa-list"></i> <span data-i18n="loanPortfolio">Loan Portfolio</span></h3>
+            <div style="overflow-x: auto;">
+                <table class="loans-table">
+                    <thead>
+                        <tr>
+                            <th data-i18n="loanId">Loan ID</th>
+                            <th data-i18n="startDate">Start Date</th>
+                            <th data-i18n="principal">Principal</th>
+                            <th data-i18n="interestRate">Interest Rate</th>
+                            <th data-i18n="term">Term</th>
+                            <th data-i18n="status">Status</th>
+                            <th data-i18n="returnAmount">Return</th>
+                        </tr>
+                    </thead>
+                    <tbody id="loansTableBody">
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer - Same as index.html -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Wealth Club</h3>
+                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">Building financial futures through
+                        strategic investment and wealth preservation.</p>
+                    <div class="social-links">
+                        <a href="https://t.me/+btRgoRmPJ5NmZjVh" aria-label="Telegram"><i
+                                class="fab fa-telegram"></i></a>
+                        <a href="https://wa.link/fr5kt4" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Wealth Club. All rights reserved. | Private Investment Fund</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script>
+        // ====
+        // PORTFOLIO DATA - EDIT THIS SECTION TO UPDATE
+        // ====
+
+        const portfolioData = {
+            // Summary statistics
+            summary: {
+                totalInvested: 38000,
+                currentValue: 41800,
+                activeLoans: 12,
+                totalReturn: 10.0
+            },
+
+            // Monthly performance data for chart
+            // Format: { month: "YYYY-MM", principal: amount, value: amount, interest: amount }
+            performance: [
+                { month: "2024-01", principal: 15000, value: 15000, interest: 0 },
+                { month: "2024-02", principal: 18000, value: 18150, interest: 150 },
+                { month: "2024-03", principal: 22000, value: 22380, interest: 380 },
+                { month: "2024-04", principal: 25000, value: 25650, interest: 650 },
+                { month: "2024-05", principal: 28000, value: 28980, interest: 980 },
+                { month: "2024-06", principal: 30000, value: 31350, interest: 1350 },
+                { month: "2024-07", principal: 32000, value: 33760, interest: 1760 },
+                { month: "2024-08", principal: 34000, value: 36210, interest: 2210 },
+                { month: "2024-09", principal: 35000, value: 37700, interest: 2700 },
+                { month: "2024-10", principal: 36000, value: 39240, interest: 3240 },
+                { month: "2024-11", principal: 37000, value: 40480, interest: 3480 },
+                { month: "2024-12", principal: 38000, value: 41800, interest: 3800 }
+            ],
+
+            // Individual loans data
+            // Format: { id, startDate, principal, rate, term, status, returnAmount }
+            loans: [
+                { id: "WC-2024-001", startDate: "2024-01-15", principal: 5000, rate: 10, term: "12 months", status: "active", returnAmount: 500 },
+                { id: "WC-2024-002", startDate: "2024-02-01", principal: 3000, rate: 10, term: "12 months", status: "active", returnAmount: 275 },
+                { id: "WC-2024-003", startDate: "2024-02-20", principal: 4000, rate: 10, term: "12 months", status: "active", returnAmount: 333 },
+                { id: "WC-2024-004", startDate: "2024-03-10", principal: 3000, rate: 10, term: "12 months", status: "active", returnAmount: 225 },
+                { id: "WC-2024-005", startDate: "2024-04-05", principal: 2500, rate: 10, term: "12 months", status: "active", returnAmount: 167 },
+                { id: "WC-2024-006", startDate: "2024-05-15", principal: 3500, rate: 10, term: "12 months", status: "active", returnAmount: 204 },
+                { id: "WC-2024-007", startDate: "2024-06-01", principal: 2000, rate: 10, term: "12 months", status: "active", returnAmount: 100 },
+                { id: "WC-2024-008", startDate: "2024-07-20", principal: 4000, rate: 10, term: "12 months", status: "active", returnAmount: 167 },
+                { id: "WC-2024-009", startDate: "2024-08-10", principal: 3000, rate: 10, term: "12 months", status: "active", returnAmount: 100 },
+                { id: "WC-2024-010", startDate: "2024-09-05", principal: 2500, rate: 10, term: "12 months", status: "active", returnAmount: 63 },
+                { id: "WC-2024-011", startDate: "2024-10-15", principal: 3000, rate: 10, term: "12 months", status: "active", returnAmount: 50 },
+                { id: "WC-2024-012", startDate: "2024-11-01", principal: 2500, rate: 10, term: "12 months", status: "pending", returnAmount: 0 }
+            ]
+        };
+
+        // ====
+        // CHART AND UI LOGIC (No need to edit below)
+        // ====
+
+        let chart = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSummary();
+            updateChart('all');
+            updateLoansTable();
+            initChartControls();
+            initTheme();
+        });
+
+        function updateSummary() {
+            const { summary } = portfolioData;
+            document.getElementById('totalInvested').textContent = formatCurrency(summary.totalInvested);
+            document.getElementById('activeLoans').textContent = summary.activeLoans;
+            document.getElementById('currentValue').textContent = formatCurrency(summary.currentValue);
+
+            const returnEl = document.getElementById('totalReturn');
+            const returnValue = summary.totalReturn;
+            returnEl.textContent = (returnValue >= 0 ? '+' : '') + returnValue.toFixed(1) + '%';
+            returnEl.className = 'portfolio-stat-number ' + (returnValue >= 0 ? 'positive' : 'negative');
+        }
+
+        function updateChart(range) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            let data = filterDataByRange(portfolioData.performance, range);
+
+            const labels = data.map(d => formatMonth(d.month));
+            const principalData = data.map(d => d.principal);
+            const valueData = data.map(d => d.value);
+            const interestData = data.map(d => d.interest);
+
+            if (chart) chart.destroy();
+
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+            const textColor = isDark ? '#fff' : '#0a2540';
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Principal Invested',
+                            data: principalData,
+                            borderColor: '#635bff',
+                            backgroundColor: 'rgba(99, 91, 255, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Portfolio Value',
+                            data: valueData,
+                            borderColor: '#00d4aa',
+                            backgroundColor: 'rgba(0, 212, 170, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Interest Earned',
+                            data: interestData,
+                            borderColor: '#ff9f43',
+                            backgroundColor: 'transparent',
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: isDark ? '#1a1a2e' : '#fff',
+                            titleColor: textColor,
+                            bodyColor: textColor,
+                            borderColor: '#00d4aa',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: ctx => `${ctx.dataset.label}: ${formatCurrency(ctx.raw)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { color: gridColor },
+                            ticks: {
+                                color: textColor,
+                                callback: value => formatCurrency(value)
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            grid: { display: false },
+                            ticks: {
+                                color: '#ff9f43',
+                                callback: value => formatCurrency(value)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateLoansTable() {
+            const tbody = document.getElementById('loansTableBody');
+            tbody.innerHTML = portfolioData.loans.map(loan => `
+                <tr>
+                    <td><strong>${loan.id}</strong></td>
+                    <td>${formatDate(loan.startDate)}</td>
+                    <td>${formatCurrency(loan.principal)}</td>
+                    <td>${loan.rate}%</td>
+                    <td>${loan.term}</td>
+                    <td><span class="status-badge ${loan.status}">${capitalizeFirst(loan.status)}</span></td>
+                    <td style="color: #00d4aa; font-weight: 600;">+${formatCurrency(loan.returnAmount)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function initChartControls() {
+            document.querySelectorAll('.chart-controls button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.chart-controls button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    updateChart(btn.dataset.range);
+                });
+            });
+        }
+
+        function filterDataByRange(data, range) {
+            if (range === 'all') return data;
+            const months = { '3m': 3, '6m': 6, '1y': 12 };
+            return data.slice(-months[range]);
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
+        }
+
+        function formatMonth(monthStr) {
+            const [year, month] = monthStr.split('-');
+            return new Date(year, month - 1).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+        }
+
+        function formatDate(dateStr) {
+            return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Theme handling
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon();
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon();
+            updateChart(document.querySelector('.chart-controls button.active')?.dataset.range || 'all');
+        }
+
+        function updateThemeIcon() {
+            const icon = document.querySelector('.theme-toggle i');
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        }
+    </script>
+    <script src="/i18n.js"></script>
+    <script src="/script.js"></script>
+</body>
+
+</html>
